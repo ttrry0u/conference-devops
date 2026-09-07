@@ -25,3 +25,6 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
 @app.get("/")
 def root():
     return {"message": "Welcome to Conference API. Go to /docs for Swagger UI"}
+
+from app.routers import science
+app.include_router(science.router)
