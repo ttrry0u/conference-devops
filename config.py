@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     # По умолчанию используем SQLite, но можно легко поменять на PostgreSQL
     database_url: str = "sqlite:///./conference.db"
@@ -8,5 +9,6 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+
 
 settings = Settings()
