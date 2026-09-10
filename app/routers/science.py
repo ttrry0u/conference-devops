@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, #HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from app.models.science import Invitation, Abstract
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+#from typing import Optional
 
 router = APIRouter(prefix="/science", tags=["science"])
 
