@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request  # Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 from database import engine, Base  # get_db
+from app.routers import participants
 
-# from config import settings
 
 # Создаем таблицы в БД при запуске (для простоты)
 Base.metadata.create_all(bind=engine)
@@ -29,3 +29,6 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
 @app.get("/")
 def root():
     return {"message": "Welcome to Conference API. Go to /docs for Swagger UI"}
+
+
+app.include_router(participants.router)
