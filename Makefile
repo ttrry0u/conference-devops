@@ -11,7 +11,7 @@ UVICORN := $(VENV)/bin/uvicorn
 .PHONY: setup run test quality verify
 
 setup:
-	$(PYTHON) -m venv $(VENV)
+	python3 -m venv $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.txt
 
