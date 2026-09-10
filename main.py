@@ -4,7 +4,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from database import engine, Base  # get_db
 from app.routers import participants
 
-
 # Создаем таблицы в БД при запуске (для простоты)
 Base.metadata.create_all(bind=engine)
 
