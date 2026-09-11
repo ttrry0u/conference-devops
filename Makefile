@@ -1,24 +1,28 @@
 SHELL := /bin/bash
 
+VENV := venv
+PYTHON := $(VENV)/bin/python3
+PIP := $(VENV)/bin/pip
+PYTEST := $(VENV)/bin/pytest
+BLACK := $(VENV)/bin/black
+FLAKE8 := $(VENV)/bin/flake8
+UVICORN := $(VENV)/bin/uvicorn
+
 .PHONY: setup run test quality verify
 
 setup:
-	python3 -m venv venv
-	. venv/bin/activate
-	pip install --upgrade pip
-	pip install -r requirements.txt
+	python3 -m venv $(VENV)
+	$(PIP) install --upgrade pip
+	$(PIP) install -r requirements.txt
 
-run: setup
-	. venv/bin/activate
-	uvicorn main:app --reload
+run:
+	$(UVICORN) main:app --reload
 
-test: setup
-	. venv/bin/activate
-	pytest tests/ -v
+test:
+	$(PYTEST) tests/ -v
 
-quality: setup
-	. venv/bin/activate
-	black . --check
-	flake8 .
+quality:
+	$(BLACK) . --check
+	$(FLAKE8) .
 
 verify: test quality
