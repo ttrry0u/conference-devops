@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from database import engine, Base  # get_db
 from app.routers import participants
 from app.routers import science
+from app.routers import org
 
 # Создаем таблицы в БД при запуске (для простоты)
 Base.metadata.create_all(bind=engine)
@@ -33,3 +34,4 @@ def root():
 
 app.include_router(science.router)
 app.include_router(participants.router)
+app.include_router(org.router)
