@@ -109,3 +109,28 @@
 - Спикер не может оценивать свой собственный доклад.
 - Оценка должна быть в диапазоне от 1 до 5.
 - При нарушении правил возвращаются HTTP-статусы (некорректные данные) или 409 (конфликт с бизнес-логикой).
+
+# ER-диаграмма БД
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+erDiagram
+    PARTICIPANT ||--o| APPLICATION : submits
+    APPLICATION ||--o| FEE : pays
+    PARTICIPANT {
+        int id
+        string full_name
+        string email
+    }
+    APPLICATION {
+        int id
+        int participant_id
+        string status
+        boolean needs_hotel
+    }
+    FEE {
+        int id
+        int application_id
+        float amount
+        string status
+    }
+```
