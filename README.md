@@ -114,23 +114,59 @@
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
 erDiagram
-    PARTICIPANT ||--o| APPLICATION : submits
-    APPLICATION ||--o| FEE : pays
+    PARTICIPANT ||--o{ INVITATION : receives
+    PARTICIPANT ||--o{ ABSTRACT : submits
+    PARTICIPANT ||--o| FEE : pays
+    PARTICIPANT ||--o| HOTEL : books
+    PARTICIPANT ||--o{ MAILING : receives
+
     PARTICIPANT {
         int id
         string full_name
         string email
+        string role
+        boolean is_online
     }
-    APPLICATION {
+    
+    INVITATION {
         int id
         int participant_id
         string status
-        boolean needs_hotel
+        datetime sent_at
     }
+    
+    ABSTRACT {
+        int id
+        int participant_id
+        string title
+        string content
+        string status
+        datetime submitted_at
+    }
+    
     FEE {
         int id
-        int application_id
+        int participant_id
         float amount
         string status
+        datetime paid_at
+    }
+    
+    HOTEL {
+        int id
+        int participant_id
+        string check_in
+        string check_out
+        string status
+        datetime created_at
+    }
+    
+    MAILING {
+        int id
+        int participant_id
+        string subject
+        string body
+        string status
+        datetime sent_at
     }
 ```
