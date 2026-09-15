@@ -27,6 +27,14 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     )
 
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Внутренняя ошибка сервера. Пожалуйста, попробуйте позже."},
+    )
+
+
 @app.get("/")
 def root():
     return {"message": "Welcome to Conference API. Go to /docs for Swagger UI"}
