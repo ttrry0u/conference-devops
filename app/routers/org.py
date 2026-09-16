@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from database import get_db
 from app.models.org import Fee, Hotel, Mailing
@@ -76,7 +76,28 @@ def pay_fee(fee_id: int, db: Session = Depends(get_db)):
 
 @router.post("/hotels/", response_model=HotelResponse)
 def create_hotel(hotel: HotelCreate, db: Session = Depends(get_db)):
-    """Заявка на бронирование гостиницы."""
+    """Заявка на бронирование гостиницы с валидацией дат."""
+    from datetime import date, datetime as dt
+
+    try:
+        check_in_date = dt.strptime(hotel.check_in, "%Y-%m-%d").date()
+        check_out_date = dt.strptime(hotel.check_out, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=400, detail="Неверный формат даты. Используйте ГГГГ-ММ-ДД"
+        )
+
+    if check_in_date < date.today():
+        raise HTTPException(
+            status_code=400,
+            detail="Дата заезда не может быть в прошлом. Укажите будущую дату.",
+        )
+
+    if check_out_date <= check_in_date:
+        raise HTTPException(
+            status_code=400, detail="Дата выезда должна быть СТРОГО позже даты заезда!"
+        )
+
     db_hotel = Hotel(**hotel.model_dump())
     db.add(db_hotel)
     db.commit()
@@ -87,13 +108,10 @@ def create_hotel(hotel: HotelCreate, db: Session = Depends(get_db)):
 @router.patch("/hotels/{hotel_id}/book", response_model=HotelResponse)
 def book_hotel(hotel_id: int, db: Session = Depends(get_db)):
 
-    # Бронирование гостиницы.
-    # БИЗНЕС-ПРАВИЛО: только при оплаченном оргвзносе!
     hotel = db.query(Hotel).filter(Hotel.id == hotel_id).first()
     if not hotel:
         raise HTTPException(status_code=404, detail="Заявка на гостиницу не найдена")
 
-    # Проверяем, оплатил ли участник взнос
     fee = (
         db.query(Fee)
         .filter(Fee.participant_id == hotel.participant_id, Fee.status == "paid")
@@ -124,3 +142,43 @@ def create_mailing(mailing: MailingCreate, db: Session = Depends(get_db)):
 @router.get("/mailings/", response_model=list[MailingResponse])
 def get_mailings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db.query(Mailing).offset(skip).limit(limit).all()
+
+
+@router.delete("/fees/{fee_id}", status_code=204)
+def delete_fee(fee_id: int, db: Session = Depends(get_db)):
+    item = db.query(Fee).filter(Fee.id == fee_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Взнос не найден")
+    db.delete(item)
+    db.commit()
+    return Response(status_code=204)
+
+
+@router.delete("/hotels/{hotel_id}", status_code=204)
+def delete_hotel(hotel_id: int, db: Session = Depends(get_db)):
+    item = db.query(Hotel).filter(Hotel.id == hotel_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Заявка не найдена")
+    db.delete(item)
+    db.commit()
+    return Response(status_code=204)
+
+
+@router.delete("/mailings/{mailing_id}", status_code=204)
+def delete_mailing(mailing_id: int, db: Session = Depends(get_db)):
+    item = db.query(Mailing).filter(Mailing.id == mailing_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Рассылка не найдена")
+    db.delete(item)
+    db.commit()
+    return Response(status_code=204)
+
+
+@router.get("/fees/", response_model=list[FeeResponse])
+def get_fees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return db.query(Fee).offset(skip).limit(limit).all()
+
+
+@router.get("/hotels/", response_model=list[HotelResponse])
+def get_hotels(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return db.query(Hotel).offset(skip).limit(limit).all()

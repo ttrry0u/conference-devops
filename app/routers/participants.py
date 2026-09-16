@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from database import get_db
 from app.models.participants import Participant
@@ -53,3 +53,13 @@ def get_participant(participant_id: int, db: Session = Depends(get_db)):
     if not participant:
         raise HTTPException(status_code=404, detail="Участник не найден")
     return participant
+
+
+@router.delete("/{participant_id}", status_code=204)
+def delete_participant(participant_id: int, db: Session = Depends(get_db)):
+    item = db.query(Participant).filter(Participant.id == participant_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Участник не найден")
+    db.delete(item)
+    db.commit()
+    return Response(status_code=204)
