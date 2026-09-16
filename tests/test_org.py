@@ -43,8 +43,8 @@ def test_book_hotel_without_payment():
         "/org/hotels/",
         json={
             "participant_id": p["id"],
-            "check_in": "2024-01-01",
-            "check_out": "2024-01-05",
+            "check_in": "2026-12-12",
+            "check_out": "2026-12-13",
         },
     ).json()
 
@@ -63,8 +63,8 @@ def test_book_hotel_with_payment():
         "/org/hotels/",
         json={
             "participant_id": p["id"],
-            "check_in": "2024-01-01",
-            "check_out": "2024-01-05",
+            "check_in": "2026-12-12",
+            "check_out": "2026-12-14",
         },
     ).json()
 
